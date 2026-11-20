@@ -7,7 +7,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers();
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
-builder.Services.AddSingleton<IGuidProvider, GuidProvider>();
+builder.Services.AddScoped<IGuidProvider, GuidProvider>();
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -19,26 +19,16 @@ if (app.Environment.IsDevelopment())
         options.SwaggerEndpoint("/openapi/v1.json", "TaskFlow API v1");
     });
 }
-
-app.UseHttpsRedirection();
-
-app.UseAuthorization();
 app.Use(async (context, next) =>
 {
     Console.WriteLine($"-> {context.Request.Method},{context.Request.Path}");
     await next();
     Console.WriteLine($"<-{context.Response.StatusCode}");
 });
-app.Use(async (context, next) =>
-{
-    if (context.Request.Path == "/blocked")
-    {
-        context.Response.StatusCode = 403;
-        return;
-    }
-    await next();
-    
-});
+app.UseHttpsRedirection();
+
+app.UseAuthorization();
+
 app.MapControllers();
 
 app.Run();
