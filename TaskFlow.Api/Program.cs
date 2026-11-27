@@ -1,3 +1,6 @@
+//using TaskFlow.Api.Services;
+
+using Microsoft.OpenApi;
 using TaskFlow.Api.Services;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -6,8 +9,11 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
-builder.Services.AddOpenApi();
-builder.Services.AddScoped<IGuidProvider, GuidProvider>();
+builder.Services.AddOpenApi(options =>
+{
+    options.OpenApiVersion = OpenApiSpecVersion.OpenApi3_0;
+});
+builder.Services.AddSingleton<IProjectService, InMemoryProjectService>();
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
